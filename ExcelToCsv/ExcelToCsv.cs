@@ -44,7 +44,7 @@ namespace ExcelToCsv
                     return false;
                 
                 var tempExcelFile = Path.Combine(path, fileName);
-                File.Copy(excelFile, tempExcelFile, overwrite: true);
+                System.IO.File.Copy(excelFile, tempExcelFile, overwrite: true);
 
                 XSSFWorkbook xssfWorkbook;
                 using (var fileStream = new FileStream(tempExcelFile, FileMode.Open, FileAccess.Read))
@@ -69,7 +69,7 @@ namespace ExcelToCsv
 
                 sheetNames.ForEach(n => CreateCsvFile(excelFile, xssfWorkbook, n));
 
-                File.Delete(tempExcelFile);
+                System.IO.File.Delete(tempExcelFile);
 
                 return true;
             }
