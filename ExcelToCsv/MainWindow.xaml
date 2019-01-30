@@ -7,19 +7,31 @@
         mc:Ignorable="d"
         Title="MainWindow"
         Height="450"
-        Width="500">
+        Width="500"
+        UseLayoutRounding="True">
     
     <Window.Resources>
         <ResourceDictionary>
             <Style TargetType="{x:Type Button}"
-                   x:Key="Button25">
+                   x:Key="ButtonTemplate">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+            </Style>
+            <Style TargetType="{x:Type Button}"
+                   x:Key="ButtonTemplate25"
+                   BasedOn="{StaticResource ButtonTemplate}">
                 <Setter Property="Width" Value="25"/>
                 <Setter Property="Height" Value="25"/>
             </Style>
             <Style TargetType="{x:Type Button}"
-                   x:Key="Button50">
+                   x:Key="ButtonTemplate50"
+                   BasedOn="{StaticResource ButtonTemplate}">
                 <Setter Property="Width" Value="50"/>
                 <Setter Property="Height" Value="50"/>
+            </Style>
+            <Style TargetType="{x:Type Image}">
+                <Setter Property="Stretch" Value="None"/>
             </Style>
         </ResourceDictionary>
     </Window.Resources>
@@ -43,48 +55,114 @@
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.ColumnSpan="2"
-                           LastChildFill="False">
+                           LastChildFill="False"
+                           Margin="5">
                     <Button Command="{Binding OpenDefaultFolderCommand}"
                             DockPanel.Dock="Right"
-                            Style="{StaticResource Button25}"/>
+                            Style="{StaticResource ButtonTemplate25}">
+                        <Image Source="Resources/Images/StartFolder_16x16.png"/>
+                    </Button>
                     <Button Command="{Binding OpenFolderCommand}"
                             DockPanel.Dock="Right"
-                            Style="{StaticResource Button25}"/>
+                            Style="{StaticResource ButtonTemplate25}">
+                        <Image Source="Resources/Images/Open_16x16.png"/>
+                    </Button>
+                    <Button Command="{Binding GoToFolderCommand}"
+                            DockPanel.Dock="Left"
+                            Style="{StaticResource ButtonTemplate25}">
+                        <Image Source="Resources/Images/Folder_16x16.png"/>
+                    </Button>
                     <TextBox BorderThickness="0"
                              IsReadOnly="True"
+                             VerticalAlignment="Center"
                              Text="{Binding WorkDirectory, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
-                <ListView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
+                <ListBox Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
                          ItemsSource="{Binding ExcelFiles, UpdateSourceTrigger=PropertyChanged}"
-                         SelectionMode="Extended">
-                    <ListView.ItemTemplate>
+                         SelectedItem="{Binding SelectedExcelFile}"
+                         SelectionMode="Extended"
+                         >
+                    <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding FileName}"/>
+                                <Image Margin="5"
+                                       Source="Resources/Images/Excel_16x16.png"/>
+                                <TextBlock Margin="5"
+                                           Text="{Binding FileName}"/>
                             </StackPanel>
                         </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
 
-                <ListBox Grid.Column="0" Grid.Row="2"
-                         ItemsSource="{Binding ExcelFilePages}"/>
+                <DockPanel Grid.Column="0" Grid.Row="2">
+                    <TextBlock Background="DarkGreen"
+                               DockPanel.Dock="Top"
+                               FontWeight="DemiBold"
+                               Foreground="White"
+                               Padding="2"
+                               Text="Pages"/>
+                    <ListBox ItemsSource="{Binding ExcelFilePages}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Margin="5 2"
+                                           Source="Resources/Images/Page_16x16.png"/>
+                                    <TextBlock Margin="5 2"
+                                               Text="{Binding PageName}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
 
-                <ListBox Grid.Column="1" Grid.Row="2"
-                         ItemsSource="{Binding CsvFiles}"/>
+                <DockPanel Grid.Column="1" Grid.Row="2">
+                    <TextBlock Background="DarkGreen"
+                               DockPanel.Dock="Top"
+                               FontWeight="DemiBold"
+                               Foreground="White"
+                               Padding="2"
+                               Text="CSV files"/>
+                    <ListBox ItemsSource="{Binding CsvFiles}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Margin="5 2"
+                                           Source="Resources/Images/CSV_16x16.png"/>
+                                    <TextBlock Margin="5 2"
+                                               Text="{Binding FileName}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
             </Grid>
 
             <DockPanel Grid.Column="1"
                        LastChildFill="False">
                 <Button Command="{Binding CreateCsvFilesCommand}"
                         DockPanel.Dock="Top"
-                        Style="{StaticResource Button50}"/>
+                        Style="{StaticResource ButtonTemplate50}">
+                    <Image Source="Resources/Images/CreateCSV_32x32.png"/>
+                </Button>
+                <Button Command="{Binding DeleteCsvFilesCommand}"
+                        DockPanel.Dock="Top"
+                        Style="{StaticResource ButtonTemplate50}">
+                    <Image Source="Resources/Images/DeleteCSV_32x32.png"/>
+                </Button>
                 <Button Command="{Binding OpenExcelFileCommand}"
                         DockPanel.Dock="Top"
-                        Style="{StaticResource Button50}"/>
+                        Style="{StaticResource ButtonTemplate50}">
+                    <Image Source="Resources/Images/Excel_32x32.png"/>
+                </Button>
                 <Button Command="{Binding CloseCommand}"
                         DockPanel.Dock="Bottom"
-                        Style="{StaticResource Button50}"/>
+                        Style="{StaticResource ButtonTemplate50}"/>
             </DockPanel>
         </Grid>
     </Grid>
