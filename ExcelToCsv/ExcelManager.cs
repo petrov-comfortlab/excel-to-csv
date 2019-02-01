@@ -10,22 +10,24 @@ using NPOI.XSSF.UserModel;
 
 namespace ExcelToCsv
 {
-    public class ExcelManager
+    public class ExcelManager : IDisposable
     {
         private readonly string _csvDirectory;
         private readonly string _excelFile;
-        private readonly IWorkbook _xssfWorkbook;
+        private readonly string _copyExcelFile;
+        private readonly IWorkbook _workbook;
 
         public ExcelManager(string excelFile)
         {
             if (string.IsNullOrEmpty(excelFile))
                 return;
 
-            using (var fileStream = new FileStream(excelFile, FileMode.Open, FileAccess.Read))
-                _xssfWorkbook = new XSSFWorkbook(fileStream);
-
+            _copyExcelFile = CreateTemplateFile(excelFile);
             _excelFile = excelFile;
             _csvDirectory = GetCsvDirectory(excelFile);
+
+            using (var fileStream = new FileStream(_copyExcelFile, FileMode.Open, FileAccess.Read))
+                _workbook = new XSSFWorkbook(fileStream);
         }
 
         private static string GetCsvDirectory(string excelFile)
@@ -50,7 +52,7 @@ namespace ExcelToCsv
         {
             try
             {
-                var sheet = _xssfWorkbook.GetSheet(sheetName);
+                var sheet = _workbook.GetSheet(sheetName);
 
                 if (sheet == null)
                     return;
@@ -138,25 +140,82 @@ namespace ExcelToCsv
             }
         }
 
-        public static List<string> GetExcelPages(string excelFile)
+        public List<string> GetExcelSheets(string excelFile)
         {
             if (string.IsNullOrEmpty(excelFile))
                 return new List<string>();
 
-            IWorkbook xssfWorkbook;
-            using (var fileStream = new FileStream(excelFile, FileMode.Open, FileAccess.Read))
-                xssfWorkbook = new XSSFWorkbook(fileStream);
-
             var sheetNames = new List<string>();
-            var numberOfSheets = xssfWorkbook.NumberOfSheets;
+            var numberOfSheets = _workbook.NumberOfSheets;
 
             for (var i = 0; i < numberOfSheets; i++)
             {
-                var sheet = xssfWorkbook.GetSheetAt(i);
+                var sheet = _workbook.GetSheetAt(i);
                 sheetNames.Add(sheet.SheetName);
             }
 
             return sheetNames;
+        }
+
+        private static string CreateTemplateFile(string excelFile)
+        {
+            var templatePath = Environment.GetFolderPath(Environment.SpecialFolder.Templates);
+            var fileName = Path.GetFileName(excelFile);
+            var tempExcelFile = Path.Combine(templatePath, fileName);
+
+            File.Copy(excelFile, tempExcelFile, overwrite: true);
+            return tempExcelFile;
+        }
+
+        public void Dispose()
+        {
+            File.Delete(_copyExcelFile);
+        }
+
+        public void CommentSheet(string sheetName)
+        {
+            if (string.IsNullOrEmpty(sheetName) ||
+                sheetName.StartsWith("#"))
+                return;
+
+            using (var fileStream = new FileStream(_excelFile, FileMode.Open, FileAccess.ReadWrite))
+            {
+                var xssfWorkbook = new XSSFWorkbook(fileStream);
+                var sheetIndex = xssfWorkbook.GetSheetIndex(sheetName);
+                xssfWorkbook.SetSheetName(sheetIndex, $"#{sheetName}");
+            }
+        }
+
+        public void UncommentSheet(string sheetName)
+        {
+            if (string.IsNullOrEmpty(sheetName) ||
+                !sheetName.StartsWith("#"))
+                return;
+
+            //using (var fileStream = new FileStream(_excelFile, FileMode.Open, FileAccess.ReadWrite))
+            //{
+            //    var xssfWorkbook = new XSSFWorkbook(fileStream);
+            //    var sheetIndex = xssfWorkbook.GetSheetIndex(sheetName);
+            //    xssfWorkbook.SetSheetName(sheetIndex, sheetName.Substring(1));
+            //    xssfWorkbook.Write(fileStream);
+            //    fileStream.Close();
+            //}
+
+            //XSSFWorkbook xssfWorkbook;
+            //using (var file = new FileStream(_copyExcelFile, FileMode.Open, FileAccess.ReadWrite))
+            //{
+            //    xssfWorkbook = new XSSFWorkbook(file);
+            //}
+
+            //var mstream = new MemoryStream();
+            //xssfWorkbook.Write(mstream);
+
+            //var fileStream = new FileStream(_excelFile, FileMode.Create, System.IO.FileAccess.Write);
+            //var bytes = new byte[mstream.Length];
+            //mstream.Read(bytes, 0, (int)mstream.Length);
+            //fileStream.Write(bytes, 0, bytes.Length);
+            //fileStream.Close();
+            //mstream.Close();
         }
     }
 }

@@ -117,4 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CloseFile" xml:space="preserve">
+    <value>Закрыть файл</value>
+  </data>
+  <data name="CommentSheet" xml:space="preserve">
+    <value>Не создавать CSV файл для этого листа</value>
+  </data>
+  <data name="CreateCsvFiles" xml:space="preserve">
+    <value>Создать CSV файлы</value>
+  </data>
+  <data name="CSVFiles" xml:space="preserve">
+    <value>CSV файлы</value>
+  </data>
+  <data name="DeleteCsvFiles" xml:space="preserve">
+    <value>Удалить CSV файлы</value>
+  </data>
+  <data name="OpenInExcel" xml:space="preserve">
+    <value>Открыть в Excel</value>
+  </data>
+  <data name="OpenInNewWindow" xml:space="preserve">
+    <value>Открыть в новом окне</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Переименовать</value>
+  </data>
+  <data name="SelectFolder" xml:space="preserve">
+    <value>Выбрать папку</value>
+  </data>
+  <data name="Sheets" xml:space="preserve">
+    <value>Листы</value>
+  </data>
+  <data name="UncommentSheet" xml:space="preserve">
+    <value>Создавать CSV файл для этого листа</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Выбрать всё</value>
+  </data>
 </root>

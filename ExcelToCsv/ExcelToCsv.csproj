@@ -55,6 +55,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -77,12 +78,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BindingProxy.cs" />
     <Compile Include="CommandHandler.cs" />
+    <Compile Include="Converters\UnactiveSheetIconVisibilityConverter.cs" />
+    <Compile Include="Converters\ActiveSheetIconVisibilityConverter.cs" />
+    <Compile Include="Converters\SheetIconConverter.cs" />
     <Compile Include="Elements\File.cs" />
-    <Compile Include="Elements\Page.cs" />
+    <Compile Include="Elements\Sheet.cs" />
     <Compile Include="ExcelManager.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Resources\Dictionary.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Dictionary.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\Icons.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Icons.resx</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -112,6 +127,22 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Resources\Icons.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <Resource Include="Resources\Images\Sheet_16x16.png" />
+    <Resource Include="Resources\Images\UnactiveSheet_16x16.png" />
+    <Resource Include="Resources\Images\Rename_16x16.png" />
+    <Resource Include="Resources\Images\CreateCSV_16x16.png" />
+    <Resource Include="Resources\Images\DeleteCSV_16x16.png" />
+    <EmbeddedResource Include="Resources\Dictionary.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Dictionary.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Dictionary.ru.resx" />
+    <Resource Include="Resources\Images\OpenStartFolder_16x16.png" />
+    <Resource Include="Resources\Images\Close_25x25.png" />
     <Resource Include="Resources\Images\DeleteCSV_32x32.png" />
     <Resource Include="Resources\Images\Folder_16x16.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -141,9 +172,6 @@
     <Resource Include="Resources\Images\Open_16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\StartFolder_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Images\Excel_32x32.png" />
   </ItemGroup>
   <ItemGroup>
@@ -151,7 +179,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\CSV_16x16.png" />
-    <Resource Include="Resources\Images\Page_16x16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2,29 +2,38 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using ExcelToCsv.Annotations;
 using ExcelToCsv.Elements;
 using Microsoft.Win32;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using File = ExcelToCsv.Elements.File;
 
 namespace ExcelToCsv
 {
-    public class ViewModel : INotifyPropertyChanged
+    public class ViewModel : INotifyPropertyChanged, IDisposable
     {
+        private string _csvFileName;
         private string _workDirectory;
-        private ObservableCollection<File> _excelFiles;
-        private ObservableCollection<Page> _excelFilePages;
-        private ObservableCollection<File> _csvFiles;
+        private DataTable _csvDataGrid;
+        private ExcelManager _excelManager;
+        private File _selectedCsvFile;
         private File _selectedExcelFile;
+        private ObservableCollection<File> _excelFiles;
+        private ObservableCollection<Sheet> _excelFileSheets;
+        private ObservableCollection<File> _csvFiles;
+        private Visibility _csvTextVisibility;
+        private Visibility _excelFilesVisibility;
+        private Sheet _selectedSheet;
+        private Visibility _commentMenuItemVisibility;
+        private Visibility _uncommentMenuItemVisibility;
 
         private static readonly List<string> ExcelExtensions = new List<string>
         {
@@ -36,8 +45,10 @@ namespace ExcelToCsv
 
         public ViewModel()
         {
-            WorkDirectory = $@"D:\Серёжа\#ostec\Детали";
+            WorkDirectory = $@"E:\YanDisk\#ostec\Setup\Source Files\Common\!_Excel\Детали";
             //SetDefaultExcelFiles();
+
+            ShowExcelFiles();
         }
 
         private void SetDefaultExcelFiles()
@@ -61,7 +72,8 @@ namespace ExcelToCsv
         private void SetExcelFiles()
         {
             var files = Directory.GetFiles(WorkDirectory)
-                .Where(n => ExcelExtensions.Contains(Path.GetExtension(n)))
+                .Where(n => !Path.GetFileName(n).StartsWith("~$") &&
+                            ExcelExtensions.Contains(Path.GetExtension(n)))
                 .Select(n => new File(n));
 
             ExcelFiles = new ObservableCollection<File>(files);
@@ -79,12 +91,12 @@ namespace ExcelToCsv
             }
         }
 
-        public ObservableCollection<Page> ExcelFilePages
+        public ObservableCollection<Sheet> ExcelFileSheets
         {
-            get => _excelFilePages;
+            get => _excelFileSheets;
             set
             {
-                _excelFilePages = value;
+                _excelFileSheets = value;
                 OnPropertyChanged();
             }
         }
@@ -105,7 +117,10 @@ namespace ExcelToCsv
             set
             {
                 _selectedExcelFile = value;
+                _excelManager = new ExcelManager(value?.FullPath);
+
                 OnPropertyChanged();
+
                 SetExcelFilePages(value);
                 SetCsvFiles(value);
             }
@@ -115,8 +130,8 @@ namespace ExcelToCsv
 
         private void SetExcelFilePages(File excelFile)
         {
-            var pages = ExcelManager.GetExcelPages(excelFile?.FullPath).Select(n => new Page(n));
-            ExcelFilePages = new ObservableCollection<Page>(pages);
+            var pages = _excelManager.GetExcelSheets(excelFile?.FullPath).Select(n => new Sheet(n));
+            ExcelFileSheets = new ObservableCollection<Sheet>(pages);
         }
 
         private void SetCsvFiles(File excelFile)
@@ -144,6 +159,170 @@ namespace ExcelToCsv
         }
 
         #endregion
+
+        public Sheet SelectedSheet
+        {
+            get => _selectedSheet;
+            set
+            {
+                if (Equals(value, _selectedSheet)) return;
+                _selectedSheet = value;
+                OnPropertyChanged();
+
+                SetMenuItemsVisibility(value);
+            }
+        }
+
+        private void SetMenuItemsVisibility(Sheet value)
+        {
+            if (string.IsNullOrEmpty(value?.SheetName))
+            {
+                CommentMenuItemVisibility = Visibility.Collapsed;
+                UncommentMenuItemVisibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (value.SheetName.StartsWith("#"))
+            {
+                CommentMenuItemVisibility = Visibility.Collapsed;
+                UncommentMenuItemVisibility = Visibility.Visible;
+            }
+            else
+            {
+                CommentMenuItemVisibility = Visibility.Visible;
+                UncommentMenuItemVisibility = Visibility.Collapsed;
+            }
+        }
+
+        public File SelectedCsvFile
+        {
+            get => _selectedCsvFile;
+            set
+            {
+                if (value == null || Equals(value, _selectedCsvFile)) return;
+                _selectedCsvFile = value;
+                OnPropertyChanged();
+                ShowCsvFiles();
+                CsvFileName = SelectedCsvFile?.FileName;
+                SetCsvDataGrid(SelectedCsvFile?.FullPath);
+            }
+        }
+
+        private void SetCsvDataGrid(string file)
+        {
+            if (string.IsNullOrEmpty(file) ||
+                !System.IO.File.Exists(file) ||
+                Path.GetExtension(file).ToLower() != ".csv")
+                return;
+
+            var lines = System.IO.File.ReadLines(file, Encoding.GetEncoding(1251)).ToList();
+            var allCells = new List<List<object>>();
+
+            var regex = new Regex("(?<=^|;)(\"(?:[^\"]|\"\")*\"|[^;]*)");
+            var columnNumber = 0;
+
+            foreach (var line in lines)
+            {
+                var cells = new List<object>();
+
+                foreach (Match m in regex.Matches(line))
+                {
+                    cells.Add(m.Groups[1].ToString().Trim('"'));
+                }
+                
+                if (columnNumber < cells.Count)
+                    columnNumber = cells.Count;
+
+                allCells.Add(cells);
+            }
+
+            var dataTable = new DataTable();
+
+            for (var i = 0; i < columnNumber; i++)
+                dataTable.Columns.Add();
+
+            foreach (var rowCells in allCells)
+                dataTable.Rows.Add(rowCells.ToArray());
+
+            CsvDataGrid = dataTable;
+        }
+
+        public string CsvFileName
+        {
+            get => _csvFileName;
+            set
+            {
+                if (value == _csvFileName) return;
+                _csvFileName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public DataTable CsvDataGrid
+        {
+            get => _csvDataGrid;
+            set
+            {
+                _csvDataGrid = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility CsvTextVisibility
+        {
+            get => _csvTextVisibility;
+            set
+            {
+                if (value == _csvTextVisibility) return;
+                _csvTextVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility ExcelFilesVisibility
+        {
+            get => _excelFilesVisibility;
+            set
+            {
+                if (value == _excelFilesVisibility) return;
+                _excelFilesVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility CommentMenuItemVisibility
+        {
+            get => _commentMenuItemVisibility;
+            set
+            {
+                if (value == _commentMenuItemVisibility) return;
+                _commentMenuItemVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility UncommentMenuItemVisibility
+        {
+            get => _uncommentMenuItemVisibility;
+            set
+            {
+                if (value == _uncommentMenuItemVisibility) return;
+                _uncommentMenuItemVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void ShowCsvFiles()
+        {
+            CsvTextVisibility = Visibility.Visible;
+            ExcelFilesVisibility = Visibility.Collapsed;
+        }
+
+        private void ShowExcelFiles()
+        {
+            CsvTextVisibility = Visibility.Collapsed;
+            ExcelFilesVisibility = Visibility.Visible;
+        }
 
         #region Commands
 
@@ -187,7 +366,7 @@ namespace ExcelToCsv
 
         public ICommand CreateCsvFilesCommand => new CommandHandler
         {
-            CanExecuteFunc = () => true,
+            CanExecuteFunc = () => SelectedExcelFile != null && (ExcelFileSheets?.Any() ?? false),
             CommandAction = CreateCsvFiles
         };
 
@@ -200,17 +379,18 @@ namespace ExcelToCsv
             SetCsvFiles(SelectedExcelFile);
         }
 
-        private static void CreateCsvFile(string excelFile)
+        private void CreateCsvFile(string excelFile)
         {
-            var excelManager = new ExcelManager(excelFile);
-            var pages = ExcelManager.GetExcelPages(excelFile);
+            _excelManager = new ExcelManager(excelFile);
+
+            var pages = _excelManager.GetExcelSheets(excelFile);
 
             foreach (var page in pages)
             {
                 if (page.StartsWith("#"))
                     continue;
 
-                excelManager.CreateCsvFile(page);
+                _excelManager.CreateCsvFile(page);
             }
         }
 
@@ -218,7 +398,7 @@ namespace ExcelToCsv
 
         public ICommand DeleteCsvFilesCommand => new CommandHandler
         {
-            CanExecuteFunc = () => true,
+            CanExecuteFunc = () => SelectedExcelFile != null && (CsvFiles?.Any() ?? false),
             CommandAction = DeleteCsvFiles
         };
 
@@ -244,8 +424,26 @@ namespace ExcelToCsv
 
         public ICommand OpenExcelFileCommand => new CommandHandler
         {
-            CanExecuteFunc = () => true,
+            CanExecuteFunc = () => SelectedExcelFile != null,
             CommandAction = () => ExcelFiles.Where(n => n.IsSelected).ToList().ForEach(n => Process.Start(n.FullPath))
+        };
+
+        public ICommand CloseCsvFileCommand => new CommandHandler
+        {
+            CanExecuteFunc = () => true,
+            CommandAction = ShowExcelFiles
+        };
+
+        public ICommand CommentSheetCommand => new CommandHandler
+        {
+            CanExecuteFunc = () => !SelectedSheet?.SheetName?.StartsWith("#") ?? false,
+            CommandAction = () => _excelManager.CommentSheet(SelectedSheet?.SheetName)
+        };
+
+        public ICommand UncommentSheetCommand => new CommandHandler
+        {
+            CanExecuteFunc = () => SelectedSheet?.SheetName?.StartsWith("#") ?? false,
+            CommandAction = () => _excelManager.UncommentSheet(SelectedSheet?.SheetName)
         };
 
         #endregion
@@ -256,6 +454,12 @@ namespace ExcelToCsv
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Dispose()
+        {
+            _csvDataGrid?.Dispose();
+            _excelManager?.Dispose();
         }
     }
 }

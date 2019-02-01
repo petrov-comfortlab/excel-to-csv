@@ -4,13 +4,22 @@ using ExcelToCsv.Annotations;
 
 namespace ExcelToCsv.Elements
 {
-    public class Page : INotifyPropertyChanged
+    public class Sheet : INotifyPropertyChanged
     {
         private bool _isSelected;
+        private string _sheetName;
 
-        public Page(string pageName) => PageName = pageName;
+        public Sheet(string pageName) => SheetName = pageName;
 
-        public string PageName { get; }
+        public string SheetName
+        {
+            get => _sheetName;
+            set
+            {
+                _sheetName = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool IsSelected
         {

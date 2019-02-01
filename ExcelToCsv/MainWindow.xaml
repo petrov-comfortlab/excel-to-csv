@@ -4,6 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExcelToCsv2"
+        xmlns:resources="clr-namespace:ExcelToCsv.Resources"
+        xmlns:excelToCsv="clr-namespace:ExcelToCsv"
+        xmlns:converters="clr-namespace:ExcelToCsv.Converters"
         mc:Ignorable="d"
         Title="MainWindow"
         Height="450"
@@ -12,11 +15,120 @@
     
     <Window.Resources>
         <ResourceDictionary>
+
+            <Style TargetType="{x:Type Image}">
+                <Setter Property="Stretch" Value="None"/>
+            </Style>
+
+            <excelToCsv:BindingProxy x:Key="DataContextProxy"
+                                     Data="{Binding}" />
+
+            <Image x:Key="CreateCsvFilesIcon"
+                   Source="Resources/Images/CreateCSV_16x16.png"/>
+            <Image x:Key="DeleteCsvFilesIcon"
+                   Source="Resources/Images/DeleteCSV_16x16.png"/>
+            <Image x:Key="ExcelIcon"
+                   Source="Resources/Images/Excel_16x16.png"/>
+            <Image x:Key="RenameIcon"
+                   Source="Resources/Images/Rename_16x16.png"/>
+
+            <Style TargetType="{x:Type MenuItem}"
+                   x:Key="CreateCsvMenuItem">
+                <Setter Property="Command"
+                        Value="{Binding Data.CreateCsvFilesCommand, Source={StaticResource DataContextProxy}}"/>
+                <Setter Property="Header"
+                        Value="{x:Static resources:Dictionary.CreateCsvFiles}"/>
+                <Setter Property="Icon"
+                        Value="{StaticResource CreateCsvFilesIcon}"/>
+            </Style>
+
+            <Style TargetType="{x:Type MenuItem}"
+                   x:Key="DeleteCsvMenuItem">
+                <Setter Property="Command"
+                        Value="{Binding Data.DeleteCsvFilesCommand, Source={StaticResource DataContextProxy}}"/>
+                <Setter Property="Header"
+                        Value="{x:Static resources:Dictionary.DeleteCsvFiles}"/>
+                <Setter Property="Icon"
+                        Value="{StaticResource DeleteCsvFilesIcon}"/>
+            </Style>
+
+            <Style TargetType="{x:Type MenuItem}"
+                   x:Key="OpenMenuItem">
+                <Setter Property="Command"
+                        Value="{Binding Data.OpenExcelFileCommand, Source={StaticResource DataContextProxy}}"/>
+                <Setter Property="Header"
+                        Value="{x:Static resources:Dictionary.OpenInExcel}"/>
+                <Setter Property="Icon"
+                        Value="{StaticResource ExcelIcon}"/>
+            </Style>
+
+            <Style TargetType="{x:Type MenuItem}"
+                   x:Key="RenameMenuItem">
+                <Setter Property="Command"
+                        Value="{Binding Data.RenameExcelFileCommand, Source={StaticResource DataContextProxy}}"/>
+                <Setter Property="Header"
+                        Value="{x:Static resources:Dictionary.Rename}"/>
+                <Setter Property="Icon"
+                        Value="{StaticResource RenameIcon}"/>
+            </Style>
+
+            <Style TargetType="{x:Type MenuItem}"
+                   x:Key="CommentMenuItem">
+                <Setter Property="Command"
+                        Value="{Binding Data.CommentSheetCommand, Source={StaticResource DataContextProxy}}"/>
+                <Setter Property="Header"
+                        Value="{x:Static resources:Dictionary.CommentSheet}"/>
+                <Setter Property="Visibility"
+                        Value="{Binding Data.CommentMenuItemVisibility,
+                                        Source={StaticResource DataContextProxy},
+                                        Mode=OneWay,
+                                        UpdateSourceTrigger=PropertyChanged}"/>
+            </Style>
+
+            <Style TargetType="{x:Type MenuItem}"
+                   x:Key="UncommentMenuItem">
+                <Setter Property="Command"
+                        Value="{Binding Data.UncommentSheetCommand, Source={StaticResource DataContextProxy}}"/>
+                <Setter Property="Header"
+                        Value="{x:Static resources:Dictionary.UncommentSheet}"/>
+                <Setter Property="Visibility"
+                        Value="{Binding Data.UncommentMenuItemVisibility,
+                                        Source={StaticResource DataContextProxy},
+                                        Mode=OneWay,
+                                        UpdateSourceTrigger=PropertyChanged}"/>
+            </Style>
+
+            <ContextMenu x:Key="ExcelFileContextMenu">
+                <MenuItem Style="{StaticResource CreateCsvMenuItem}"/>
+                <MenuItem Style="{StaticResource DeleteCsvMenuItem}"/>
+                <Separator/>
+                <MenuItem Style="{StaticResource OpenMenuItem}"/>
+                <!--<MenuItem Style="{StaticResource RenameMenuItem}"/>-->
+            </ContextMenu>
+
+            <ContextMenu x:Key="SheetsContextMenu">
+                <MenuItem Style="{StaticResource CommentMenuItem}"/>
+                <MenuItem Style="{StaticResource UncommentMenuItem}"/>
+                <Separator/>
+                <MenuItem Style="{StaticResource RenameMenuItem}"/>
+            </ContextMenu>
+
             <Style TargetType="{x:Type Button}"
                    x:Key="ButtonTemplate">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Padding" Value="0"/>
+                <Style.Resources>
+                    <Style TargetType="Image">
+                        <Setter Property="Stretch" Value="None"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Style.Resources>
             </Style>
             <Style TargetType="{x:Type Button}"
                    x:Key="ButtonTemplate25"
@@ -30,8 +142,14 @@
                 <Setter Property="Width" Value="50"/>
                 <Setter Property="Height" Value="50"/>
             </Style>
-            <Style TargetType="{x:Type Image}">
-                <Setter Property="Stretch" Value="None"/>
+            <Style TargetType="{x:Type TextBlock}"
+                   x:Key="HeaderTextBlockStyle">
+                <Setter Property="Background" Value="#1F7044"/>
+                <Setter Property="FontWeight" Value="DemiBold"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="Padding" Value="4"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
         </ResourceDictionary>
     </Window.Resources>
@@ -50,26 +168,24 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.ColumnSpan="2"
                            LastChildFill="False"
-                           Margin="5">
-                    <Button Command="{Binding OpenDefaultFolderCommand}"
-                            DockPanel.Dock="Right"
-                            Style="{StaticResource ButtonTemplate25}">
-                        <Image Source="Resources/Images/StartFolder_16x16.png"/>
-                    </Button>
+                           Margin="5 5 0 5">
                     <Button Command="{Binding OpenFolderCommand}"
                             DockPanel.Dock="Right"
-                            Style="{StaticResource ButtonTemplate25}">
+                            Style="{StaticResource ButtonTemplate25}"
+                            ToolTip="{x:Static resources:Dictionary.SelectFolder}">
                         <Image Source="Resources/Images/Open_16x16.png"/>
                     </Button>
                     <Button Command="{Binding GoToFolderCommand}"
                             DockPanel.Dock="Left"
-                            Style="{StaticResource ButtonTemplate25}">
+                            Style="{StaticResource ButtonTemplate25}"
+                            ToolTip="{x:Static resources:Dictionary.OpenInNewWindow}">
                         <Image Source="Resources/Images/Folder_16x16.png"/>
                     </Button>
                     <TextBox BorderThickness="0"
@@ -78,57 +194,94 @@
                              Text="{Binding WorkDirectory, UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
 
-                <ListBox Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
-                         ItemsSource="{Binding ExcelFiles, UpdateSourceTrigger=PropertyChanged}"
-                         SelectedItem="{Binding SelectedExcelFile}"
-                         SelectionMode="Extended"
-                         >
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Image Margin="5"
-                                       Source="Resources/Images/Excel_16x16.png"/>
-                                <TextBlock Margin="5"
-                                           Text="{Binding FileName}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
-
-                <DockPanel Grid.Column="0" Grid.Row="2">
-                    <TextBlock Background="DarkGreen"
-                               DockPanel.Dock="Top"
-                               FontWeight="DemiBold"
-                               Foreground="White"
-                               Padding="2"
-                               Text="Pages"/>
-                    <ListBox ItemsSource="{Binding ExcelFilePages}">
+                <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+                    <ListBox ContextMenu="{StaticResource ExcelFileContextMenu}"
+                             ItemsSource="{Binding ExcelFiles, UpdateSourceTrigger=PropertyChanged}"
+                             SelectedItem="{Binding SelectedExcelFile}"
+                             SelectionMode="Extended"
+                             Visibility="{Binding ExcelFilesVisibility, UpdateSourceTrigger=PropertyChanged}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
+                                    <Image Margin="5"
+                                           Source="Resources/Images/Excel_16x16.png"/>
+                                    <TextBlock Margin="5"
+                                               Text="{Binding FileName}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <DockPanel Visibility="{Binding CsvTextVisibility, UpdateSourceTrigger=PropertyChanged}">
+                        <DockPanel DockPanel.Dock="Top"
+                                   LastChildFill="True">
+                            <Button Command="{Binding CloseCsvFileCommand}"
+                                    DockPanel.Dock="Right"
+                                    Style="{StaticResource ButtonTemplate25}"
+                                    ToolTip="{x:Static resources:Dictionary.CloseFile}">
+                                <Image Source="Resources/Images/Close_25x25.png"/>
+                            </Button>
+                            <TextBlock Style="{StaticResource HeaderTextBlockStyle}"
+                                       Text="{Binding CsvFileName}"/>
+                        </DockPanel>
+                        <DataGrid Background="Transparent"
+                                  BorderThickness="0"
+                                  GridLinesVisibility="None"
+                                  HeadersVisibility="None"
+                                  IsReadOnly="True"
+                                  ItemsSource="{Binding CsvDataGrid}"
+                                  />
+                        <!--<TextBox HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 IsReadOnly="True"
+                                 Text="{Binding CsvText, UpdateSourceTrigger=PropertyChanged}"/>-->
+                    </DockPanel>
+                </Grid>
+
+                <GridSplitter Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2"
+                              Height="5"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center"/>
+
+                <DockPanel Grid.Column="0" Grid.Row="3">
+                    <TextBlock DockPanel.Dock="Top"
+                               Style="{StaticResource HeaderTextBlockStyle}"
+                               Text="{x:Static resources:Dictionary.Sheets}"/>
+                    <ListBox ContextMenu="{StaticResource SheetsContextMenu}"
+                             ItemsSource="{Binding ExcelFileSheets}"
+                             SelectedItem="{Binding SelectedSheet}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DataTemplate.Resources>
+                                    <converters:SheetIconConverter x:Key="SheetIconConverter"/>
+                                    <converters:ActiveSheetIconVisibilityConverter x:Key="ActiveSheetIconVisibilityConverter"/>
+                                    <converters:UnactiveSheetIconVisibilityConverter x:Key="UnactiveSheetIconVisibilityConverter"/>
+                                </DataTemplate.Resources>
+                                <StackPanel Orientation="Horizontal">
                                     <Image Margin="5 2"
-                                           Source="Resources/Images/Page_16x16.png"/>
+                                           Source="Resources/Images/Sheet_16x16.png"
+                                           Visibility="{Binding SheetName, Converter={StaticResource ActiveSheetIconVisibilityConverter}}"/>
+                                    <Image Margin="5 2"
+                                           Source="Resources/Images/UnactiveSheet_16x16.png"
+                                           Visibility="{Binding SheetName, Converter={StaticResource UnactiveSheetIconVisibilityConverter}}"/>
                                     <TextBlock Margin="5 2"
-                                               Text="{Binding PageName}"/>
+                                               Text="{Binding SheetName, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </DockPanel>
 
-                <DockPanel Grid.Column="1" Grid.Row="2">
-                    <TextBlock Background="DarkGreen"
-                               DockPanel.Dock="Top"
-                               FontWeight="DemiBold"
-                               Foreground="White"
-                               Padding="2"
-                               Text="CSV files"/>
-                    <ListBox ItemsSource="{Binding CsvFiles}">
+                <DockPanel Grid.Column="1" Grid.Row="3">
+                    <TextBlock DockPanel.Dock="Top"
+                               Style="{StaticResource HeaderTextBlockStyle}"
+                               Text="{x:Static resources:Dictionary.CSVFiles}" />
+                    <ListBox ItemsSource="{Binding CsvFiles}"
+                             SelectedItem="{Binding SelectedCsvFile}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -147,22 +300,22 @@
                        LastChildFill="False">
                 <Button Command="{Binding CreateCsvFilesCommand}"
                         DockPanel.Dock="Top"
-                        Style="{StaticResource ButtonTemplate50}">
+                        Style="{StaticResource ButtonTemplate50}"
+                        ToolTip="{x:Static resources:Dictionary.CreateCsvFiles}">
                     <Image Source="Resources/Images/CreateCSV_32x32.png"/>
                 </Button>
                 <Button Command="{Binding DeleteCsvFilesCommand}"
                         DockPanel.Dock="Top"
-                        Style="{StaticResource ButtonTemplate50}">
+                        Style="{StaticResource ButtonTemplate50}"
+                        ToolTip="{x:Static resources:Dictionary.DeleteCsvFiles}">
                     <Image Source="Resources/Images/DeleteCSV_32x32.png"/>
                 </Button>
                 <Button Command="{Binding OpenExcelFileCommand}"
                         DockPanel.Dock="Top"
-                        Style="{StaticResource ButtonTemplate50}">
+                        Style="{StaticResource ButtonTemplate50}"
+                        ToolTip="{x:Static resources:Dictionary.OpenInExcel}">
                     <Image Source="Resources/Images/Excel_32x32.png"/>
                 </Button>
-                <Button Command="{Binding CloseCommand}"
-                        DockPanel.Dock="Bottom"
-                        Style="{StaticResource ButtonTemplate50}"/>
             </DockPanel>
         </Grid>
     </Grid>
