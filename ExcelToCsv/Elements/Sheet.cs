@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using ExcelToCsv.Annotations;
+using ExcelToCsv.Properties;
 
 namespace ExcelToCsv.Elements
 {

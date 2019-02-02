@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace ExcelToCsv
+namespace ExcelToCsv.CommandHandlers
 {
     public class CommandHandler : ICommand
     {

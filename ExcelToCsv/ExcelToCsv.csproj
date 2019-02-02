@@ -79,7 +79,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BindingProxy.cs" />
-    <Compile Include="CommandHandler.cs" />
+    <Compile Include="CommandHandlers\CommandParameterHandler.cs" />
+    <Compile Include="CommandHandlers\CommandHandler.cs" />
     <Compile Include="Converters\UnactiveSheetIconVisibilityConverter.cs" />
     <Compile Include="Converters\ActiveSheetIconVisibilityConverter.cs" />
     <Compile Include="Converters\SheetIconConverter.cs" />

@@ -3,14 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ExcelToCsv2"
         xmlns:resources="clr-namespace:ExcelToCsv.Resources"
         xmlns:excelToCsv="clr-namespace:ExcelToCsv"
         xmlns:converters="clr-namespace:ExcelToCsv.Converters"
         mc:Ignorable="d"
         Title="MainWindow"
         Height="450"
-        Width="500"
+        Width="600"
         UseLayoutRounding="True">
     
     <Window.Resources>
@@ -31,6 +30,10 @@
                    Source="Resources/Images/Excel_16x16.png"/>
             <Image x:Key="RenameIcon"
                    Source="Resources/Images/Rename_16x16.png"/>
+            <Image x:Key="SheetIcon"
+                   Source="Resources/Images/Sheet_16x16.png"/>
+            <Image x:Key="UnactiveSheetIcon"
+                   Source="Resources/Images/UnactiveSheet_16x16.png"/>
 
             <Style TargetType="{x:Type MenuItem}"
                    x:Key="CreateCsvMenuItem">
@@ -78,6 +81,8 @@
                         Value="{Binding Data.CommentSheetCommand, Source={StaticResource DataContextProxy}}"/>
                 <Setter Property="Header"
                         Value="{x:Static resources:Dictionary.CommentSheet}"/>
+                <Setter Property="Icon"
+                        Value="{StaticResource UnactiveSheetIcon}"/>
                 <Setter Property="Visibility"
                         Value="{Binding Data.CommentMenuItemVisibility,
                                         Source={StaticResource DataContextProxy},
@@ -91,6 +96,8 @@
                         Value="{Binding Data.UncommentSheetCommand, Source={StaticResource DataContextProxy}}"/>
                 <Setter Property="Header"
                         Value="{x:Static resources:Dictionary.UncommentSheet}"/>
+                <Setter Property="Icon"
+                        Value="{StaticResource SheetIcon}"/>
                 <Setter Property="Visibility"
                         Value="{Binding Data.UncommentMenuItemVisibility,
                                         Source={StaticResource DataContextProxy},
@@ -151,17 +158,59 @@
                 <Setter Property="Padding" Value="4"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
+            <Style TargetType="{x:Type GridSplitter}">
+                <Setter Property="Background" Value="Transparent"/>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            
-            <Grid>
+
+            <ListBox ItemsSource="{Binding QuickDirectories}"
+                     SelectionChanged="Selector_OnSelected">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Button Background="Transparent"
+                                BorderThickness="0"
+                                Command="{Binding Data.OpenFastFolderCommand, Source={StaticResource DataContextProxy}}"
+                                CommandParameter="{Binding }"
+                                Cursor="Hand"
+                                ToolTip="{Binding FullPath}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Margin="5"
+                                       Source="Resources/Images/Folder_16x16.png"/>
+                                <TextBlock Margin="5"
+                                           Text="{Binding FileName}"/>
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <!--<Style.Triggers>
+                            <Trigger Property="IsMouseOver" 
+                                     Value="True">
+                                <Setter Property="Background" Value="Yellow" />
+                            </Trigger>
+                        </Style.Triggers>-->
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+
+            <GridSplitter Grid.Column="1"
+                          Width="5"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Stretch"
+                          />
+
+            <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -296,7 +345,7 @@
                 </DockPanel>
             </Grid>
 
-            <DockPanel Grid.Column="1"
+            <DockPanel Grid.Column="3"
                        LastChildFill="False">
                 <Button Command="{Binding CreateCsvFilesCommand}"
                         DockPanel.Dock="Top"

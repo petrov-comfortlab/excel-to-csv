@@ -11,8 +11,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using ExcelToCsv.Annotations;
+using ExcelToCsv.CommandHandlers;
 using ExcelToCsv.Elements;
+using ExcelToCsv.Properties;
 using Microsoft.Win32;
 using File = ExcelToCsv.Elements.File;
 
@@ -26,14 +27,15 @@ namespace ExcelToCsv
         private ExcelManager _excelManager;
         private File _selectedCsvFile;
         private File _selectedExcelFile;
+        private Sheet _selectedSheet;
         private ObservableCollection<File> _excelFiles;
         private ObservableCollection<Sheet> _excelFileSheets;
         private ObservableCollection<File> _csvFiles;
         private Visibility _csvTextVisibility;
         private Visibility _excelFilesVisibility;
-        private Sheet _selectedSheet;
         private Visibility _commentMenuItemVisibility;
         private Visibility _uncommentMenuItemVisibility;
+        private ObservableCollection<File> _QuickDirectories;
 
         private static readonly List<string> ExcelExtensions = new List<string>
         {
@@ -45,15 +47,19 @@ namespace ExcelToCsv
 
         public ViewModel()
         {
-            WorkDirectory = $@"E:\YanDisk\#ostec\Setup\Source Files\Common\!_Excel\Детали";
+            QuickDirectories = new ObservableCollection<File>();
+
+            WorkDirectory = $@"D:\Серёжа\#ostec\Детали"; //$@"E:\YanDisk\#ostec\Setup\Source Files\Common\!_Excel\Детали";
             //SetDefaultExcelFiles();
+
+            Logger.Log.Debug($"ViewModel()");
 
             ShowExcelFiles();
         }
 
         private void SetDefaultExcelFiles()
         {
-            WorkDirectory = Directory.GetCurrentDirectory();
+            WorkDirectory = System.IO.Directory.GetCurrentDirectory();
         }
 
         public string WorkDirectory
@@ -64,14 +70,15 @@ namespace ExcelToCsv
                 _workDirectory = value;
                 OnPropertyChanged();
                 SetExcelFiles();
+                AddDirectory(value);
             }
         }
 
-        #region SetExcelFiles
+        #region WorkDirectory.set
 
         private void SetExcelFiles()
         {
-            var files = Directory.GetFiles(WorkDirectory)
+            var files = System.IO.Directory.GetFiles(WorkDirectory)
                 .Where(n => !Path.GetFileName(n).StartsWith("~$") &&
                             ExcelExtensions.Contains(Path.GetExtension(n)))
                 .Select(n => new File(n));
@@ -79,7 +86,31 @@ namespace ExcelToCsv
             ExcelFiles = new ObservableCollection<File>(files);
         }
 
+        private void AddDirectory(string value)
+        {
+            if (QuickDirectories.Select(n => n.FullPath).Contains(value))
+            {
+                var existDirectory = QuickDirectories.FirstOrDefault(n => n.FullPath == value);
+                var oldIndex = QuickDirectories.IndexOf(existDirectory);
+                QuickDirectories.Move(oldIndex, 0);
+            }
+            else
+            {
+                QuickDirectories.Insert(0, new File(value));
+            }
+        }
+
         #endregion
+
+        public ObservableCollection<File> QuickDirectories
+        {
+            get => _QuickDirectories;
+            set
+            {
+                _QuickDirectories = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ObservableCollection<File> ExcelFiles
         {
@@ -145,13 +176,13 @@ namespace ExcelToCsv
             var csvFolder = Path.GetFileNameWithoutExtension(excelFile.FullPath);
             var csvDirectory = Path.Combine(excelFile.Directory, csvFolder ?? throw new InvalidOperationException());
 
-            if (!Directory.Exists(csvDirectory))
+            if (!System.IO.Directory.Exists(csvDirectory))
             {
                 CsvFiles = new ObservableCollection<File>();
                 return;
             }
 
-            var files = Directory.GetFiles(csvDirectory)
+            var files = System.IO.Directory.GetFiles(csvDirectory)
                 .Where(n => string.Equals(Path.GetExtension(n), ".csv", StringComparison.OrdinalIgnoreCase))
                 .Select(n => new File(n));
 
@@ -170,27 +201,6 @@ namespace ExcelToCsv
                 OnPropertyChanged();
 
                 SetMenuItemsVisibility(value);
-            }
-        }
-
-        private void SetMenuItemsVisibility(Sheet value)
-        {
-            if (string.IsNullOrEmpty(value?.SheetName))
-            {
-                CommentMenuItemVisibility = Visibility.Collapsed;
-                UncommentMenuItemVisibility = Visibility.Collapsed;
-                return;
-            }
-
-            if (value.SheetName.StartsWith("#"))
-            {
-                CommentMenuItemVisibility = Visibility.Collapsed;
-                UncommentMenuItemVisibility = Visibility.Visible;
-            }
-            else
-            {
-                CommentMenuItemVisibility = Visibility.Visible;
-                UncommentMenuItemVisibility = Visibility.Collapsed;
             }
         }
 
@@ -324,11 +334,32 @@ namespace ExcelToCsv
             ExcelFilesVisibility = Visibility.Visible;
         }
 
+        private void SetMenuItemsVisibility(Sheet value)
+        {
+            if (string.IsNullOrEmpty(value?.SheetName))
+            {
+                CommentMenuItemVisibility = Visibility.Collapsed;
+                UncommentMenuItemVisibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (value.SheetName.StartsWith("#"))
+            {
+                CommentMenuItemVisibility = Visibility.Collapsed;
+                UncommentMenuItemVisibility = Visibility.Visible;
+            }
+            else
+            {
+                CommentMenuItemVisibility = Visibility.Visible;
+                UncommentMenuItemVisibility = Visibility.Collapsed;
+            }
+        }
+
         #region Commands
 
         public ICommand GoToFolderCommand => new CommandHandler
         {
-            CanExecuteFunc = () => Directory.Exists(WorkDirectory),
+            CanExecuteFunc = () => System.IO.Directory.Exists(WorkDirectory),
             CommandAction = () => Process.Start(WorkDirectory)
         };
 
@@ -357,6 +388,16 @@ namespace ExcelToCsv
         }
 
         #endregion
+
+        public ICommand OpenFastFolderCommand => new CommandParameterHandler
+        {
+            CanExecuteFunc = () => true,
+            CommandAction = obj =>
+            {
+                if (obj is File file)
+                    WorkDirectory = file.FullPath;
+            }
+        };
 
         public ICommand OpenDefaultFolderCommand => new CommandHandler
         {
@@ -416,8 +457,8 @@ namespace ExcelToCsv
             var csvFolder = Path.GetFileNameWithoutExtension(excelFile);
             var csvDirectory = Path.Combine(WorkDirectory, csvFolder ?? throw new InvalidOperationException());
 
-            if (Directory.Exists(csvDirectory))
-                Directory.Delete(csvDirectory, recursive: true);
+            if (System.IO.Directory.Exists(csvDirectory))
+                System.IO.Directory.Delete(csvDirectory, recursive: true);
         }
 
         #endregion
@@ -437,13 +478,21 @@ namespace ExcelToCsv
         public ICommand CommentSheetCommand => new CommandHandler
         {
             CanExecuteFunc = () => !SelectedSheet?.SheetName?.StartsWith("#") ?? false,
-            CommandAction = () => _excelManager.CommentSheet(SelectedSheet?.SheetName)
+            CommandAction = () =>
+            {
+                _excelManager.CommentSheet(SelectedSheet?.SheetName);
+                SetExcelFilePages(SelectedExcelFile);
+            }
         };
 
         public ICommand UncommentSheetCommand => new CommandHandler
         {
             CanExecuteFunc = () => SelectedSheet?.SheetName?.StartsWith("#") ?? false,
-            CommandAction = () => _excelManager.UncommentSheet(SelectedSheet?.SheetName)
+            CommandAction = () =>
+            {
+                _excelManager.UncommentSheet(SelectedSheet?.SheetName);
+                SetExcelFilePages(SelectedExcelFile);
+            }
         };
 
         #endregion

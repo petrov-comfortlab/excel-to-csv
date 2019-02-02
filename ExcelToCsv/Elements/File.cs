@@ -3,7 +3,7 @@ using System.CodeDom;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using ExcelToCsv.Annotations;
+using ExcelToCsv.Properties;
 
 namespace ExcelToCsv.Elements
 {
@@ -13,7 +13,8 @@ namespace ExcelToCsv.Elements
 
         public File(string fullPath)
         {
-            if (!System.IO.File.Exists(fullPath))
+            if (!System.IO.File.Exists(fullPath) &&
+                !System.IO.Directory.Exists(fullPath))
                 throw new FileNotFoundException();
 
             FullPath = fullPath;

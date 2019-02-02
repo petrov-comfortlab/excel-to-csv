@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
@@ -27,7 +28,24 @@ namespace ExcelToCsv
             _csvDirectory = GetCsvDirectory(excelFile);
 
             using (var fileStream = new FileStream(_copyExcelFile, FileMode.Open, FileAccess.Read))
-                _workbook = new XSSFWorkbook(fileStream);
+            {
+                var extension = Path.GetExtension(excelFile);
+
+                switch (extension)
+                {
+                    case ".xls":
+                        _workbook = new HSSFWorkbook(fileStream);
+                        break;
+
+                    case ".xlsx":
+                    case ".xlsm":
+                        _workbook = new XSSFWorkbook(fileStream);
+                        break;
+
+                    default:
+                        throw new FileFormatException();
+                }
+            }
         }
 
         private static string GetCsvDirectory(string excelFile)
@@ -167,23 +185,16 @@ namespace ExcelToCsv
             return tempExcelFile;
         }
 
-        public void Dispose()
-        {
-            File.Delete(_copyExcelFile);
-        }
-
         public void CommentSheet(string sheetName)
         {
             if (string.IsNullOrEmpty(sheetName) ||
                 sheetName.StartsWith("#"))
                 return;
 
-            using (var fileStream = new FileStream(_excelFile, FileMode.Open, FileAccess.ReadWrite))
-            {
-                var xssfWorkbook = new XSSFWorkbook(fileStream);
-                var sheetIndex = xssfWorkbook.GetSheetIndex(sheetName);
-                xssfWorkbook.SetSheetName(sheetIndex, $"#{sheetName}");
-            }
+            var sheetIndex = _workbook.GetSheetIndex(sheetName);
+            _workbook.SetSheetName(sheetIndex, $"#{sheetName}");
+
+            SaveExcelFile();
         }
 
         public void UncommentSheet(string sheetName)
@@ -192,30 +203,29 @@ namespace ExcelToCsv
                 !sheetName.StartsWith("#"))
                 return;
 
-            //using (var fileStream = new FileStream(_excelFile, FileMode.Open, FileAccess.ReadWrite))
-            //{
-            //    var xssfWorkbook = new XSSFWorkbook(fileStream);
-            //    var sheetIndex = xssfWorkbook.GetSheetIndex(sheetName);
-            //    xssfWorkbook.SetSheetName(sheetIndex, sheetName.Substring(1));
-            //    xssfWorkbook.Write(fileStream);
-            //    fileStream.Close();
-            //}
+            var sheetIndex = _workbook.GetSheetIndex(sheetName);
+            _workbook.SetSheetName(sheetIndex, sheetName.Substring(1));
 
-            //XSSFWorkbook xssfWorkbook;
-            //using (var file = new FileStream(_copyExcelFile, FileMode.Open, FileAccess.ReadWrite))
-            //{
-            //    xssfWorkbook = new XSSFWorkbook(file);
-            //}
+            SaveExcelFile();
+        }
 
-            //var mstream = new MemoryStream();
-            //xssfWorkbook.Write(mstream);
+        private void SaveExcelFile()
+        {
+            var memoryStream = new MemoryStream();
+            _workbook.Write(memoryStream);
+            var bytes = memoryStream.ToArray();
 
-            //var fileStream = new FileStream(_excelFile, FileMode.Create, System.IO.FileAccess.Write);
-            //var bytes = new byte[mstream.Length];
-            //mstream.Read(bytes, 0, (int)mstream.Length);
-            //fileStream.Write(bytes, 0, bytes.Length);
-            //fileStream.Close();
-            //mstream.Close();
+            using (var fileStream = new FileStream(_excelFile, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                fileStream.Write(bytes, 0, bytes.Length);
+                fileStream.Flush();
+            }
+        }
+
+        public void Dispose()
+        {
+            File.Delete(_copyExcelFile);
+            _workbook.Close();
         }
     }
 }
