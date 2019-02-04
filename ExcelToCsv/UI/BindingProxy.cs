@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace ExcelToCsv
+namespace ExcelToCsv.UI
 {
     public class BindingProxy : Freezable
     {

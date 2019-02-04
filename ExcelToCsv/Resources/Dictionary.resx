@@ -136,7 +136,7 @@
     <value>Open in Excel</value>
   </data>
   <data name="OpenInNewWindow" xml:space="preserve">
-    <value>Open in new window</value>
+    <value>Open folder in new window</value>
   </data>
   <data name="Rename" xml:space="preserve">
     <value>Rename</value>
@@ -152,5 +152,20 @@
   </data>
   <data name="SelectAll" xml:space="preserve">
     <value>Select all</value>
+  </data>
+  <data name="FileInUse" xml:space="preserve">
+    <value>File is already in use</value>
+  </data>
+  <data name="FileIsReadOnly" xml:space="preserve">
+    <value>file is read only.</value>
+  </data>
+  <data name="FilesInUse" xml:space="preserve">
+    <value>Files are already in use</value>
+  </data>
+  <data name="FileNotEditable" xml:space="preserve">
+    <value>File is not editable</value>
+  </data>
+  <data name="FilesNotEditable" xml:space="preserve">
+    <value>Files are not editable</value>
   </data>
 </root>

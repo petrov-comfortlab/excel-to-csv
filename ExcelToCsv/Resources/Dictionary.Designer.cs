@@ -106,6 +106,51 @@ namespace ExcelToCsv.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File is already in use.
+        /// </summary>
+        public static string FileInUse {
+            get {
+                return ResourceManager.GetString("FileInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to file is read only..
+        /// </summary>
+        public static string FileIsReadOnly {
+            get {
+                return ResourceManager.GetString("FileIsReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File is not editable.
+        /// </summary>
+        public static string FileNotEditable {
+            get {
+                return ResourceManager.GetString("FileNotEditable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files are already in use.
+        /// </summary>
+        public static string FilesInUse {
+            get {
+                return ResourceManager.GetString("FilesInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files are not editable.
+        /// </summary>
+        public static string FilesNotEditable {
+            get {
+                return ResourceManager.GetString("FilesNotEditable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open in Excel.
         /// </summary>
         public static string OpenInExcel {
@@ -115,7 +160,7 @@ namespace ExcelToCsv.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open in new window.
+        ///   Looks up a localized string similar to Open folder in new window.
         /// </summary>
         public static string OpenInNewWindow {
             get {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using ExcelToCsv.Properties;
 
@@ -6,10 +7,19 @@ namespace ExcelToCsv.Elements
 {
     public class Sheet : INotifyPropertyChanged
     {
-        private bool _isSelected;
         private string _sheetName;
 
-        public Sheet(string pageName) => SheetName = pageName;
+        public Sheet(string file, int index, string sheetName)
+        {
+            if (!System.IO.File.Exists(file)) throw new FileNotFoundException();
+
+            File = file;
+            Index = index;
+            SheetName = sheetName;
+        }
+
+        public int Index { get; }
+        public string File { get; }
 
         public string SheetName
         {
@@ -17,16 +27,6 @@ namespace ExcelToCsv.Elements
             set
             {
                 _sheetName = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set
-            {
-                _isSelected = value;
                 OnPropertyChanged();
             }
         }

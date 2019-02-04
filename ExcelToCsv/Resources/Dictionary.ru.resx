@@ -136,7 +136,7 @@
     <value>Открыть в Excel</value>
   </data>
   <data name="OpenInNewWindow" xml:space="preserve">
-    <value>Открыть в новом окне</value>
+    <value>Открыть папку в новом окне</value>
   </data>
   <data name="Rename" xml:space="preserve">
     <value>Переименовать</value>
@@ -152,5 +152,20 @@
   </data>
   <data name="SelectAll" xml:space="preserve">
     <value>Выбрать всё</value>
+  </data>
+  <data name="FileInUse" xml:space="preserve">
+    <value>Файл уже используется</value>
+  </data>
+  <data name="FileIsReadOnly" xml:space="preserve">
+    <value>является файлом только для чтения.</value>
+  </data>
+  <data name="FilesInUse" xml:space="preserve">
+    <value>Файлы уже используются</value>
+  </data>
+  <data name="FileNotEditable" xml:space="preserve">
+    <value>Файл не доступен для редактирования</value>
+  </data>
+  <data name="FilesNotEditable" xml:space="preserve">
+    <value>Файлы не доступны для редактирования</value>
   </data>
 </root>
