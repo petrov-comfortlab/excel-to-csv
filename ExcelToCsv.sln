@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToCsv", "ExcelToCsv\ExcelToCsv.csproj", "{0EA6CA28-C199-4C33-B7D1-24B0AFCE6DAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Installer", "Installer\Installer.csproj", "{A98EBD3D-7154-44F1-9F6C-EA5FC28980ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{0EA6CA28-C199-4C33-B7D1-24B0AFCE6DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EA6CA28-C199-4C33-B7D1-24B0AFCE6DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EA6CA28-C199-4C33-B7D1-24B0AFCE6DAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A98EBD3D-7154-44F1-9F6C-EA5FC28980ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A98EBD3D-7154-44F1-9F6C-EA5FC28980ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A98EBD3D-7154-44F1-9F6C-EA5FC28980ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A98EBD3D-7154-44F1-9F6C-EA5FC28980ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

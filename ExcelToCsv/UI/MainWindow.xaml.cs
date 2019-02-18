@@ -15,7 +15,7 @@ namespace ExcelToCsv.UI
             {
                 InitializeComponent();
 
-                var viewModel = new ViewModel();
+                var viewModel = new MainViewModel();
                 DataContext = viewModel;
 
                 Closed += (sender, args) => { viewModel.Dispose(); };

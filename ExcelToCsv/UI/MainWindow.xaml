@@ -247,6 +247,12 @@
                         ToolTip="{x:Static resources:Dictionary.OpenInExcel}">
                     <Image Source="../Resources/Images/Excel_32x32.png"/>
                 </Button>
+                <Button Command="{Binding AboutCommand}"
+                        DockPanel.Dock="Bottom"
+                        Style="{StaticResource ButtonTemplate50}"
+                        ToolTip="{x:Static resources:Dictionary.OpenInExcel}">
+                    <Image Source="../Resources/Images/Info_32x32.png"/>
+                </Button>
             </DockPanel>
         </Grid>
     </Grid>

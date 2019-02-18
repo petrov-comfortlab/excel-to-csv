@@ -8,9 +8,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Excel to CSV converter")]
 [assembly: AssemblyDescription("Create CSV files from Excel file pages")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ExcelToCsv")]
-[assembly: AssemblyCopyright("Copyright © Sergey Petrov, 2019")]
+[assembly: AssemblyCompany("ComfortLab")]
+[assembly: AssemblyProduct("Excel to CSV converter")]
+[assembly: AssemblyCopyright("Copyright © Sergey Petrov, Comfort Laboratory, 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

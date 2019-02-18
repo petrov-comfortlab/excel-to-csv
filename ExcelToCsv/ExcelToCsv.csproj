@@ -36,6 +36,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Costura, Version=3.3.2.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.3.3.2\lib\net40\Costura.dll</HintPath>
@@ -93,6 +97,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Properties\Annotations1.cs" />
+    <Compile Include="Resources\AppData.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppData.resx</DependentUpon>
+    </Compile>
+    <Compile Include="UI\AboutViewModel.cs" />
+    <Compile Include="UI\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\BindingProxy.cs" />
     <Compile Include="CommandHandlers\CommandParameterHandler.cs" />
     <Compile Include="CommandHandlers\CommandHandler.cs" />
@@ -115,7 +129,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Dictionary.resx</DependentUpon>
     </Compile>
-    <Compile Include="UI\ViewModel.cs" />
+    <Compile Include="UI\MainViewModel.cs" />
+    <Page Include="UI\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\ContextMenus.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -146,12 +164,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Resource Include="Resources\Images\SiteIconRed_22x22.png" />
+    <Resource Include="Resources\Images\Twitter_22x22.png" />
+    <Resource Include="Resources\Images\ComfortLab.png" />
+    <Resource Include="Resources\Images\Info_32x32.png" />
+    <Resource Include="Resources\CSV.ICO" />
     <Resource Include="Resources\Images\SelectAll_16x16.png" />
     <Resource Include="Resources\Images\Sheet_16x16.png" />
     <Resource Include="Resources\Images\UnactiveSheet_16x16.png" />
     <Resource Include="Resources\Images\Rename_16x16.png" />
     <Resource Include="Resources\Images\CreateCSV_16x16.png" />
     <Resource Include="Resources\Images\DeleteCSV_16x16.png" />
+    <EmbeddedResource Include="Resources\AppData.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppData.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AppData.ru.resx" />
     <EmbeddedResource Include="Resources\Dictionary.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Dictionary.Designer.cs</LastGenOutput>
@@ -165,6 +193,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="CSV.ico" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

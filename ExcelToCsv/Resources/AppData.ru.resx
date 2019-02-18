@@ -117,58 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CloseFile" xml:space="preserve">
-    <value>Close file</value>
-  </data>
-  <data name="CommentSheet" xml:space="preserve">
-    <value>Don't create CSV file for this sheet</value>
-  </data>
-  <data name="CreateCsvFiles" xml:space="preserve">
-    <value>Create CSV files</value>
-  </data>
-  <data name="CSVFiles" xml:space="preserve">
-    <value>CSV files</value>
-  </data>
-  <data name="DeleteCsvFiles" xml:space="preserve">
-    <value>Delete CSV files</value>
-  </data>
-  <data name="OpenInExcel" xml:space="preserve">
-    <value>Open in Excel</value>
-  </data>
-  <data name="OpenInNewWindow" xml:space="preserve">
-    <value>Open folder in new window</value>
-  </data>
-  <data name="Rename" xml:space="preserve">
-    <value>Rename</value>
-  </data>
-  <data name="SelectFolder" xml:space="preserve">
-    <value>Select folder</value>
-  </data>
-  <data name="Sheets" xml:space="preserve">
-    <value>Sheets</value>
-  </data>
-  <data name="UncommentSheet" xml:space="preserve">
-    <value>Create CSV file for this sheet</value>
-  </data>
-  <data name="SelectAll" xml:space="preserve">
-    <value>Select all</value>
-  </data>
-  <data name="FileInUse" xml:space="preserve">
-    <value>File is already in use</value>
-  </data>
-  <data name="FileIsReadOnly" xml:space="preserve">
-    <value>file is read only.</value>
-  </data>
-  <data name="FilesInUse" xml:space="preserve">
-    <value>Files are already in use</value>
-  </data>
-  <data name="FileNotEditable" xml:space="preserve">
-    <value>File is not editable</value>
-  </data>
-  <data name="FilesNotEditable" xml:space="preserve">
-    <value>Files are not editable</value>
-  </data>
-  <data name="Version" xml:space="preserve">
-    <value>Version:</value>
+  <data name="Company" xml:space="preserve">
+    <value>Сергей Петров, ООО "ЛК Проект"</value>
   </data>
 </root>

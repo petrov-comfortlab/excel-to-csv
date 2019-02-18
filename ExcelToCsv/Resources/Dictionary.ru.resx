@@ -168,4 +168,7 @@
   <data name="FilesNotEditable" xml:space="preserve">
     <value>Файлы не доступны для редактирования</value>
   </data>
+  <data name="Version" xml:space="preserve">
+    <value>Версия:</value>
+  </data>
 </root>

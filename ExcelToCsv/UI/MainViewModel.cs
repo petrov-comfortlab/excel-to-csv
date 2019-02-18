@@ -17,9 +17,9 @@ using ExcelToCsv.Properties;
 using Microsoft.Win32;
 using File = ExcelToCsv.Elements.File;
 
-namespace ExcelToCsv
+namespace ExcelToCsv.UI
 {
-    public class ViewModel : INotifyPropertyChanged, IDisposable
+    public class MainViewModel : INotifyPropertyChanged, IDisposable
     {
         private string _fileName;
         private string _workDirectory;
@@ -44,7 +44,7 @@ namespace ExcelToCsv
         };
 
 
-        public ViewModel()
+        public MainViewModel()
         {
             SetQuickDirectories();
             SetDefaultDirectory();
@@ -682,6 +682,12 @@ namespace ExcelToCsv
         {
             CanExecuteFunc = () => true,
             CommandAction = () => SelectedSheet = SelectedSheet
+        };
+
+        public ICommand AboutCommand => new CommandHandler
+        {
+            CanExecuteFunc = () => true,
+            CommandAction = () => new AboutWindow().ShowDialog()
         };
 
         #endregion
