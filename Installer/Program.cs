@@ -23,7 +23,7 @@ namespace Installer
                     ExcelToCsvProject(
                         guid: new Guid("B6731803-190B-4FA7-B654-0F929DFF565F"),
                         upgradeGuid: new Guid("CC92BCBD-CEB7-4D6A-B494-2B6A1D4DE78F"),
-                        productGuid: new Guid("147402F4-CBA8-40CA-8654-ADF155116316")), //TODO
+                        productGuid: new Guid("318E1848-A260-4F06-BC53-B0B1A6BFF428")), //TODO
                 };
 
                 projects.ForEach(project => Compiler.BuildMsi(project));

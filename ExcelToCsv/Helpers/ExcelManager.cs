@@ -87,7 +87,7 @@ namespace ExcelToCsv.Helpers
 
                 var dataTable = new DataTable();
 
-                for (var rowIndex = 0; rowIndex < sheet.LastRowNum; rowIndex++)
+                for (var rowIndex = 0; rowIndex <= sheet.LastRowNum; rowIndex++)
                     AddDataTableRow(sheet, dataTable, rowIndex);
 
                 return dataTable;
