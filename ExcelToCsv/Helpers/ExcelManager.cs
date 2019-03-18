@@ -163,7 +163,7 @@ namespace ExcelToCsv.Helpers
             var columnsCount = sheet.GetRow(0).LastCellNum;
             var content = string.Empty;
 
-            for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++)
+            for (var rowIndex = 0; rowIndex <= rowsCount; rowIndex++)
             {
                 var rowData = GetRowAsString(sheet, columnsCount, rowIndex);
 
